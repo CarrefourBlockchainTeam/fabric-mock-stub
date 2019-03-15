@@ -505,7 +505,10 @@ export class ChaincodeMockStub implements MockStub, ChaincodeStub {
      * @returns {Promise<Buffer>}
      */
     getPrivateData(collection: string, key: string): Promise<Buffer> {
-        return (this.privateCollections[collection] || {})[key];
+        if (!(this.privateCollections[collection] || {})[key]) {
+            return Promise.resolve(Buffer.from(''));
+        }
+        return Promise.resolve(this.privateCollections[collection][key]);
     }
 
     /**
@@ -541,7 +544,7 @@ export class ChaincodeMockStub implements MockStub, ChaincodeStub {
         const value = (this.privateCollections[collection] || {})[key];
 
         if (value) {
-            (this.privateCollections[collection] as StateMap).delete(key);
+           delete (this.privateCollections[collection] as StateMap)[key];
         }
 
         return Promise.resolve();
